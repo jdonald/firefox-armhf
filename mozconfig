@@ -1,0 +1,31 @@
+CC=clang-3.9
+CXX=clang++-3.9
+ac_add_options --host=x86_64-linux-gnu
+ac_add_options --target=arm-linux-gnueabihf
+ac_add_options --prefix=/usr
+ac_add_options --with-l10n-base=/home/youruserid/firefox-59.0.2+build1/./l10n
+mk_add_options MOZ_OBJDIR=/home/youruserid/firefox-59.0.2+build1/./obj-arm-linux-gnueabihf
+ac_add_options --enable-release
+ac_add_options --disable-gconf
+ac_add_options --disable-install-strip
+ac_add_options --disable-updater
+ac_add_options --enable-application=browser
+ac_add_options --enable-startup-notification
+ac_add_options --with-distribution-id=com.ubuntu
+# See https://launchpad.net/bugs/1711337
+ac_add_options --enable-optimize="-O2 -march=armv7-a -mfloat-abi=hard -I/usr/arm-linux-gnueabihf/include/c++/4.8.4/arm-linux-gnueabihf"
+mk_add_options MOZ_MAKE_FLAGS=-j1
+ac_add_options --enable-tests
+ac_add_options --enable-crashreporter
+ac_add_options --enable-official-branding
+ac_add_options --enable-update-channel=release
+ac_add_options --disable-debug
+ac_add_options --disable-elf-hack
+ac_add_options --with-ua-vendor=Ubuntu
+# Set up Google API keys, see http://www.chromium.org/developers/how-tos/api-keys .
+# Note: these are for Ubuntu use ONLY. For your own distribution,
+# please get your own set of keys.
+# Feel free to contact Chad Miller (chad.miller@canonical.com) or Chris
+# Coulson (chris.coulson@canonical.com) for more info
+ac_add_options --with-google-api-keyfile=/home/youruserid/firefox-59.0.2+build1/debian/ga
+ac_add_options --enable-stdcxx-compat
