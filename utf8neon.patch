@@ -1,0 +1,7 @@
+--- obj-arm-linux-gnueabihf/xpcom/string/Unified_cpp_xpcom_string0.cpp.old	2018-05-04 23:24:44.905206449 +0000
++++ obj-arm-linux-gnueabihf/xpcom/string/Unified_cpp_xpcom_string0.cpp	2018-05-04 23:24:53.341394865 +0000
+@@ -107,3 +107,4 @@
+ #error "/home/jdonald/trusty/firefox-59.0.2+build1/xpcom/string/precompiled_templates.cpp defines INITGUID, so it cannot be built in unified mode."
+ #undef INITGUID
+ #endif
++#include "/home/jdonald/trusty/firefox-59.0.2+build1/xpcom/string/nsUTF8UtilsNEON.cpp"

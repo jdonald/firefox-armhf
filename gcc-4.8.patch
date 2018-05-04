@@ -1,0 +1,27 @@
+--- /usr/include/c++/4.8/cstdio.old	2018-05-04 23:03:38.356052628 +0000
++++ /usr/include/c++/4.8/cstdio	2018-05-02 03:24:30.633532078 +0000
+@@ -117,7 +117,7 @@
+   using ::fwrite;
+   using ::getc;
+   using ::getchar;
+-  using ::gets;
++  //using ::gets;
+   using ::perror;
+   using ::printf;
+   using ::putc;
+--- /usr/include/c++/4.8/complex.old	2018-05-04 23:02:02.629655334 +0000
++++ /usr/include/c++/4.8/complex	2018-05-03 17:48:51.059255348 +0000
+@@ -1217,11 +1217,11 @@
+       // DR 387. std::complex over-encapsulated.
+       __attribute ((__abi_tag__ ("cxx11")))
+       constexpr double 
+-      real() { return __real__ _M_value; }
++      real() const { return __real__ _M_value; }
+ 
+       __attribute ((__abi_tag__ ("cxx11")))
+       constexpr double 
+-      imag() { return __imag__ _M_value; }
++      imag() const { return __imag__ _M_value; }
+ #else
+       double& 
+       real() { return __real__ _M_value; }
