@@ -1,0 +1,21 @@
+--- media/kiss_fft/kiss_fft.c.old	2018-05-04 23:35:08.932594280 +0000
++++ media/kiss_fft/kiss_fft.c	2018-04-25 16:49:04.709678482 +0000
+@@ -13,6 +13,7 @@
+ */
+ 
+ 
++#include <stdlib.h>
+ #include "_kiss_fft_guts.h"
+ /* The guts header contains all the multiplication and addition macros that are defined for
+  fixed or floating point complex numbers.  It also delares the kf_ internal functions.
+--- gfx/cairo/libpixman/src/pixman.c.old	2018-05-04 23:36:32.278802926 +0000
++++ gfx/cairo/libpixman/src/pixman.c	2018-03-26 15:02:50.000000000 +0000
+@@ -28,6 +28,8 @@
+ #endif
+ #include "pixman-private.h"
+ 
++#include <stdlib.h>
++
+ pixman_implementation_t *global_implementation;
+ 
+ #ifdef TOOLCHAIN_SUPPORTS_ATTRIBUTE_CONSTRUCTOR
