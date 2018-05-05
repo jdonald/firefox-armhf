@@ -1,0 +1,12 @@
+--- servo/components/style/build_gecko.rs.old	2018-05-05 04:22:11.494401339 +0000
++++ servo/components/style/build_gecko.rs	2018-05-03 03:59:19.772017945 +0000
+@@ -205,6 +205,9 @@
+             // Disable rust unions, because we replace some types inside of
+             // them.
+             let mut builder = Builder::default()
++                .clang_arg("-target")
++                .clang_arg("arm-linux-gnueabihf")
++                .clang_arg("-I/usr/arm-linux-gnueabihf/include/c++/4.8.4/arm-linux-gnueabihf")
+                 .rustfmt_bindings(false)
+                 .rust_target(RustTarget::Stable_1_0);
+             for dir in SEARCH_PATHS.iter() {
