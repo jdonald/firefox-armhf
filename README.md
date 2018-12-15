@@ -20,13 +20,18 @@ that you'll have to troubleshoot.
       libasound2-dev:armhf libcurl4-openssl-dev:armhf libdbus-glib-1-dev:armhf libiw-dev:armhf \
       libnotify-dev:armhf libpulse-dev:armhf \
       fakeroot devscripts build-essential dpkg-cross crossbuild-essential-armhf libnss3-tools \
-      debhelper autoconf2.13 cdbs clang-3.9 zip
+      debhelper autoconf2.13 cdbs clang-3.9 zip nodejs npm
 
 Install **rustup**:
 
     curl https://sh.rustup.rs -sSf | sh
     # Edit ~/.bashrc, add Rust sourcing: . ~/.cargo/env
     rustup target add armv7-unknown-linux-gnueabihf
+
+Update **nodejs** version:
+
+    sudo npm install -g n
+    sudo n 9
 
 Add Firefox bionic source packages and fetch source:
 
@@ -35,6 +40,7 @@ Add Firefox bionic source packages and fetch source:
     deb-src [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ bionic-updates main restricted
     ^D
 
+    sudo apt-key adv --recv-key --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
     sudo apt update
     apt-get source firefox:armhf
     cd firefox-*
