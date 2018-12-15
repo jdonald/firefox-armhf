@@ -4,7 +4,7 @@ The first run in spring 2018 was done in an Ubuntu 14.04 Trusty container,
 but this flow has since been revised for a Debian Stretch x86\_64 container
 targeting Raspbian.
 
-Trusty-specific notes have been moved to `trusty.md`
+Trusty-specific notes have been moved to **trusty.md**.
 
 This is not regularly tested with continuous integration, so if you attempt
 the procedure below please expect to run into missing packages or other problems
@@ -39,7 +39,7 @@ Add Firefox bionic source packages and fetch source:
     apt-get source firefox:armhf
     cd firefox-*
 
-Apply Rust build system patch
+Apply Rust build system patch:
 
     # See build_gecko.rs.patch
 
@@ -48,6 +48,7 @@ Firefox 64 has this major difference according to changelog:
     # * Explicitly set HOME=/tmp
 
 which seems to break existing build flows. Edit debian/rules to remove the line.
+
 Then run **dpkg-buildpackage**:
 
     PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig \
