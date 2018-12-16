@@ -1,7 +1,7 @@
 # Cross-compiling Firefox for armhf with clang
 
 The first run in spring 2018 was done in an Ubuntu 14.04 Trusty container,
-but this flow has since been revised for a Debian Stretch x86\_64 container
+but this flow has since been revised for a Debian Stretch amd64 container
 targeting Raspbian.
 
 Trusty-specific notes have been moved to **trusty.md**.
@@ -45,15 +45,20 @@ Add Firefox bionic source packages and fetch source:
     apt-get source firefox:armhf
     cd firefox-*
 
-Apply Rust build system patch:
+Apply Rust cross-build patch:
 
-    # See build_gecko.rs.patch
+    patch -p1 < build_gecko.rs.patch
 
-Firefox 64 has this major difference according to changelog:
+Apply `rules.patch` to fix some conditions that are too Ubuntu-specific. Otherwise early
+on you'll hit a strange error about being unable to find `usr.bin.firefox.in`
+
+    patch -p1 < rules.patch
+
+Firefox 64.0 has this major change according to the changelog:
 
     # * Explicitly set HOME=/tmp
 
-which seems to break existing build flows. Edit debian/rules to remove the line.
+which breaks existing build flows. Apply `rules.mk.patch` to remove the line.
 
 Then run **dpkg-buildpackage**:
 
@@ -62,11 +67,12 @@ Then run **dpkg-buildpackage**:
       DEB_BUILD_OPTIONS=nocheck \
       dpkg-buildpackage -aarmhf -b -d
 
-After configuration errors, replace `mozconfig` and edit with correct paths, then resume build:
+After configuration errors, replace `mozconfig` with the one from this repo.
+Make sure you've edited it to use your correct homedir paths. Then resume the build:
 
     PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig \
       CONFIG_SITE=/etc/dpkg-cross/cross-config.amd64 \
       DEB_BUILD_OPTIONS=nocheck \
       dpkg-buildpackage -aarmhf -b -d -nc
 
-Monitor the build for the course of two hours. When errors arise, troubleshoot then resume with the -nc flag.
+Monitor the build for the course of two hours. When errors arise, troubleshoot then resume with the **-nc** flag.

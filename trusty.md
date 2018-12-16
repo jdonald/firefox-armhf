@@ -1,8 +1,9 @@
 # Cross-compiling Firefox for armhf with clang (trusty)
 
-The main **README.md** describes how to cross-compile from an x86\_64
+The main **README.md** describes how to cross-compile from an amd64
 Debian Stretch container. Read that first, then for specifics on
-building for Ubuntu 14.04 Trusty see these add-on notes.
+building for Ubuntu 14.04 Trusty see these add-on notes. A Trusty
+binary is the most portable (run it on Xenial or even Stretch).
 
 Instead of adding Bionic sources, make sure your existing sources.list
 contains the expected Trusty ports.
@@ -23,7 +24,7 @@ contains the expected Trusty ports.
 Then sudo apt update and install the many packages listed in README in addition
 to **rustup** and **node** version 9.
 
-Specific to Trusty: Apply a system-wide libstdc++ patch. See `gcc-4.8.trusty.patch`
+Specific to Trusty: Apply a *system-level* libstdc++ patch. See `gcc-4.8.trusty.patch`
 
     apt-get source firefox:armhf
     cd firefox-*
