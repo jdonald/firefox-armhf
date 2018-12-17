@@ -19,7 +19,7 @@ mk_add_options MOZ_MAKE_FLAGS=-j1
 ac_add_options --enable-tests
 ac_add_options --disable-crashreporter
 mk_add_options "export CBINDGEN=/home/youruserid/firefox-64.0+build3/./cbindgen/bin/cbindgen"
-mk_add_options "export NODEJS=/usr/local/bin/node"
+mk_add_options "export NODEJS=/usr/bin/nodejs"
 mk_add_options "export HOME=/home/youruserid"
 mk_add_options "export SHELL=/bin/bash"
 mk_add_options "export MOZBUILD_STATE_PATH=/home/youruserid/.mozbuild"
@@ -28,7 +28,6 @@ ac_add_options --enable-official-branding
 ac_add_options --enable-update-channel=release
 ac_add_options --disable-debug
 ac_add_options --disable-elf-hack
-ac_add_options --disable-webrtc
 ac_add_options --with-ua-vendor=Debian
 # Set up Google API keys, see http://www.chromium.org/developers/how-tos/api-keys .
 # Note: these are for Ubuntu use ONLY. For your own distribution,

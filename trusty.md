@@ -22,7 +22,7 @@ contains the expected Trusty ports.
     deb-src [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ trusty-updates multiverse
 
 Then sudo apt update and install the many packages listed in README in addition
-to **rustup** and **node** version 9.
+to **rustup** and **node** version 11.
 
 Specific to Trusty: Apply a *system-level* libstdc++ patch. See `gcc-4.8.trusty.patch`
 

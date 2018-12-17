@@ -1,5 +1,5 @@
---- debian/rules.old	2018-12-16 01:56:48.466548218 +0000
-+++ debian/rules	2018-12-16 02:11:24.218756885 +0000
+--- debian/rules.old	2018-12-15 17:56:48.466548218 -0800
++++ debian/rules	2018-12-15 18:32:02.147149305 -0800
 @@ -60,10 +60,12 @@
  						$(NULL)
  
@@ -10,7 +10,7 @@
  	elif [ '$(DISTRIB_VERSION_MAJOR)$(DISTRIB_VERSION_MINOR)' -ge '1310' ]; then \
  		cp $(CURDIR)/debian/usr.bin.firefox.apparmor.13.10 $(CURDIR)/debian/usr.bin.firefox.in ; \
 +	else \
-+		echo "If this line is reached, unsupported config failing miserably unable to find usr.bin.firefox.in" \
++		echo "If this line is reached, unsupported config failing miserably unable to find usr.bin.firefox.in"; \
  	fi
  
  WRITE_SUBSTVARS = $(shell echo "$(2)=$(3)" | sed 's/[ \t\n]\+/ /g' >> debian/$(1).substvars)
