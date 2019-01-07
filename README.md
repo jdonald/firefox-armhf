@@ -30,10 +30,10 @@ Install **rustup**:
 
 Add Firefox bionic source packages and fetch source:
 
-    cat | sudo tee /etc/apt/sources.list.d/firefox.list
+    cat <<EOF | sudo tee /etc/apt/sources.list.d/firefox.list
     deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ bionic-updates main restricted
     deb-src [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ bionic-updates main restricted
-    ^D
+    EOF
 
     sudo apt-key adv --recv-key --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
     sudo apt update
