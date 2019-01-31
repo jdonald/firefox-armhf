@@ -4,6 +4,9 @@ The first run in spring 2018 was done in an Ubuntu 14.04 Trusty container,
 but this flow has since been revised for a Debian Stretch amd64 container
 targeting Raspbian.
 
+The instructions below are for a recent major release such as Firefox
+65.0. To build Firefox ESR 60.0, see **esr.md**.
+
 Trusty-specific notes have been moved to **trusty.md**.
 
 This is not regularly tested with continuous integration, so if you attempt
@@ -19,8 +22,9 @@ that you'll have to troubleshoot.
       libpango1.0-dev:armhf libharfbuzz-dev:armhf libicu-dev:armhf libxt-dev:armhf libgtk-3-dev:armhf \
       libstartup-notification0-dev:armhf libasound2-dev:armhf libcurl4-openssl-dev:armhf \
       libdbus-glib-1-dev:armhf libiw-dev:armhf libnotify-dev:armhf libpulse-dev:armhf fakeroot \
-      devscripts build-essential dpkg-cross crossbuild-essential-armhf libnss3-tools debhelper \
-      autoconf2.13 cdbs clang-3.9 zip nodejs
+      devscripts build-essential dpkg-cross crossbuild-essential-armhf \
+      libreadline-dev:armhf libffi-dev:armf libbz2-dev:armhf libjsoncpp-dev:armhf \
+      libnss3-tools debhelper autoconf2.13 cdbs clang-3.9 zip nodejs
 
 Install **rustup**:
 

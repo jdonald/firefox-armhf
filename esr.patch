@@ -1,0 +1,125 @@
+diff --git a/build/moz.configure/util.configure b/build/moz.configure/util.configure
+index 3284fd8..f73de39 100644
+--- a/build/moz.configure/util.configure
++++ b/build/moz.configure/util.configure
+@@ -182,6 +182,10 @@ def find_program(file, paths=None):
+     else:
+         exts = None
+ 
++    if file.endswith(' -B'):
++        log.info('workaround for which(\'python -B\')')
++        file = file[:-3]
++
+     try:
+         if is_absolute_or_relative(file):
+             return normalize_path(which(os.path.basename(file),
+diff --git a/debian/browser.install.in b/debian/browser.install.in
+index 75c4654..e8ca1d0 100644
+--- a/debian/browser.install.in
++++ b/debian/browser.install.in
+@@ -16,15 +16,12 @@ usr/lib/@browser@/libplc4.so
+ usr/lib/@browser@/libplds4.so
+ %endif
+ %ifndef USE_SYSTEM_NSS
+-usr/lib/@browser@/libfreeblpriv3.chk
+ usr/lib/@browser@/libfreeblpriv3.so
+ usr/lib/@browser@/libnss3.so
+ usr/lib/@browser@/libnssckbi.so
+ usr/lib/@browser@/libnssdbm3.so
+ usr/lib/@browser@/libnssutil3.so
+-usr/lib/@browser@/libnssdbm3.chk
+ usr/lib/@browser@/libsmime3.so
+-usr/lib/@browser@/libsoftokn3.chk
+ usr/lib/@browser@/libsoftokn3.so
+ usr/lib/@browser@/libssl3.so
+ %endif
+diff --git a/debian/rules b/debian/rules
+index 275f1f9..e021fe5 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -116,15 +116,6 @@ ifeq (default,$(origin CXX))
+ CXX := g++
+ endif
+ 
+-ifneq (,$(findstring gcc,$(CC)))
+-ifeq (,$(filter 4.% 5.%,$(shell $(CC) -dumpversion)))
+-CFLAGS += -fno-schedule-insns2 -fno-lifetime-dse -fno-delete-null-pointer-checks
+-ifneq (,$(filter armel armhf,$(DEB_HOST_ARCH)))
+-CFLAGS += -fno-schedule-insns
+-endif
+-endif
+-endif
+-
+ CXXFLAGS = $(CFLAGS)
+ 
+ ifeq ($(DEB_HOST_ARCH_ENDIAN),big)
+@@ -307,7 +298,7 @@ debian/$($(PRODUCT))-symbolic.svg: browser/extensions/onboarding/content/img/wat
+ 	cat $< > $@
+ 
+ stamps/dh_install:: debian/noinstall debian/$($(PRODUCT))-symbolic.svg
+-	awk '{print "debian/tmp/" $$1 }' < debian/noinstall | xargs rm -r
++	awk '{print "debian/tmp/" $$1 }' < debian/noinstall | xargs rm -rf
+ 	dh_install --fail-missing
+ 
+ override_dh_install: stamps/dh_install
+diff --git a/media/libpng/moz.build b/media/libpng/moz.build
+index 6be9171..abe06cf 100644
+--- a/media/libpng/moz.build
++++ b/media/libpng/moz.build
+@@ -66,7 +66,4 @@ FINAL_LIBRARY = 'gkmedias'
+ AllowCompilerWarnings()
+ 
+ if CONFIG['CC_TYPE'] in ('clang', 'gcc'):
+-    if CONFIG['OS_ARCH'] == 'WINNT':
+-        CFLAGS += ['-std=gnu89']
+-    else:
+-        CFLAGS += ['-std=c89']
++    CFLAGS += ['-std=gnu89']
+diff --git a/media/webrtc/trunk/webrtc/common_audio/common_audio_c_gn/moz.build b/media/webrtc/trunk/webrtc/common_audio/common_audio_c_gn/moz.build
+index 97bf581..0cecd17 100644
+--- a/media/webrtc/trunk/webrtc/common_audio/common_audio_c_gn/moz.build
++++ b/media/webrtc/trunk/webrtc/common_audio/common_audio_c_gn/moz.build
+@@ -513,6 +513,26 @@ if CONFIG["CPU_ARCH"] == "arm" and CONFIG["HOST_CPU_ARCH"] == "arm" and CONFIG["
+         "/media/webrtc/trunk/webrtc/common_audio/signal_processing/spl_sqrt_floor_arm.S"
+     ]
+ 
++if CONFIG["CPU_ARCH"] == "arm" and CONFIG["HOST_CPU_ARCH"] == "arm" and CONFIG["MOZ_DEBUG"] == "1" and CONFIG["OS_TARGET"] == "Linux":
++
++    CFLAGS += [
++        "-mfpu=neon"
++    ]
++
++    ASFLAGS += [
++        "-march=armv7-a"
++    ]
++
++    DEFINES["WEBRTC_ARCH_ARM"] = True
++    DEFINES["WEBRTC_ARCH_ARM_V7"] = True
++    DEFINES["WEBRTC_HAS_NEON"] = True
++
++    SOURCES += [
++        "/media/webrtc/trunk/webrtc/common_audio/signal_processing/complex_bit_reverse_arm.S",
++        "/media/webrtc/trunk/webrtc/common_audio/signal_processing/filter_ar_fast_q12_armv7.S",
++        "/media/webrtc/trunk/webrtc/common_audio/signal_processing/spl_sqrt_floor_arm.S"
++    ]
++
+ if CONFIG["CPU_ARCH"] == "x86" and CONFIG["HOST_CPU_ARCH"] == "x86" and CONFIG["MOZ_DEBUG"] == "1" and CONFIG["OS_TARGET"] == "NetBSD":
+ 
+     CFLAGS += [
+diff --git a/servo/components/style/build_gecko.rs b/servo/components/style/build_gecko.rs
+index bf6ded1..b0a10f2 100644
+--- a/servo/components/style/build_gecko.rs
++++ b/servo/components/style/build_gecko.rs
+@@ -205,7 +205,11 @@ mod bindings {
+             // Disable rust unions, because we replace some types inside of
+             // them.
+             let mut builder = Builder::default()
+-                .rust_target(RustTarget::Stable_1_0);
++                .rust_target(RustTarget::Stable_1_0)
++                .clang_arg("-target")
++                .clang_arg("arm-linux-gnueabihf")
++                .clang_arg("-I/usr/arm-linux-gnueabihf/include/c++/6.3.0/arm-linux-gnueabihf");
++
+             let rustfmt_path = env::var_os("MOZ_AUTOMATION").and_then(|_| {
+                 env::var_os("TOOLTOOL_DIR")
+             }).map(PathBuf::from);

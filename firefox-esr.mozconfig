@@ -1,0 +1,28 @@
+# Please don't use this mozconfig unless you are planning to build
+# packages for Debian or a derivative.
+. $topsrcdir/browser/config/mozconfig
+CC=clang-3.9
+CXX=clang++-3.9
+ac_add_options --host=x86_64-linux-gnu
+ac_add_options --target=arm-linux-gnueabihf
+ac_add_options --enable-optimize="-O2 -march=armv7-a -mfloat-abi=hard -I/usr/arm-linux-gnueabihf/include/c++/6.3.0/arm-linux-gnueabihf"
+ac_add_options --disable-elf-hack
+ac_add_options --with-app-name=firefox-esr
+ac_add_options --enable-release
+ac_add_options --prefix=/usr
+ac_add_options --enable-default-toolkit=cairo-gtk3
+ac_add_options --with-google-api-keyfile=$topsrcdir/debian/google.key
+ac_add_options --with-mozilla-api-keyfile=$topsrcdir/debian/mls.key
+ac_add_options --with-system-zlib # MOZ_SYSTEM_ZLIB=1
+ac_add_options --with-system-bz2 # MOZ_SYSTEM_BZ2=1
+ac_add_options --disable-gconf
+ac_add_options --enable-readline
+ac_add_options --disable-strip
+ac_add_options --disable-install-strip
+ac_add_options --enable-startup-notification
+ac_add_options --enable-system-ffi # MOZ_SYSTEM_FFI=1
+ac_add_options --with-system-libvpx # MOZ_SYSTEM_LIBVPX=1
+ac_add_options --disable-updater
+ac_add_options --enable-pie
+ac_add_options --with-unsigned-addon-scopes=app,system
+ac_add_options --enable-alsa
