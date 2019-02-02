@@ -11,7 +11,7 @@ In addition, libffi-dev:armhf seems to be required for ESR.
 
     sudo apt install libffi-dev:armhf
 
-Next, add, add sources from debian-security to your `/etc/apt/sources.list`
+Next, add sources from debian-security to your `/etc/apt/sources.list`
 
     deb-src http://security.debian.org/ stretch/updates main contrib non-free
 

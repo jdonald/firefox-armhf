@@ -28,10 +28,9 @@ Python 3.4 is the default on Trusty, but Firefox's build process requires 3.5 or
 
     sudo apt install python3.5
 
-Patches have been bundled together in a single **trusty.patch**. For the most part
-it's similar to the Stretch patches except using gcc 4.8.4 headers instead of 6.3.0.
+We can use the same big patchfile used for Stretch:
 
-    patch -p1 < path/to/firefox-armhf/trusty.patch
+    patch -p1 < path/to/firefox-armhf/armhf.patch
 
 For clang to use old gcc headers, you must apply a *system-level* libstdc++ patch:
 

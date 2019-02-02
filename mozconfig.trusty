@@ -15,6 +15,7 @@ ac_add_options --with-distribution-id=com.ubuntu
 ac_add_options --enable-debug-symbols
 # See https://launchpad.net/bugs/1711337
 ac_add_options --enable-optimize="-O2 -march=armv7-a -mfloat-abi=hard -I/usr/arm-linux-gnueabihf/include/c++/4.8.4/arm-linux-gnueabihf"
+mk_add_options MOZ_MAKE_FLAGS=-j8
 ac_add_options --enable-tests
 ac_add_options --enable-crashreporter
 ac_add_options --enable-official-branding

@@ -88,7 +88,7 @@ diff --git a/servo/components/style/build_gecko.rs b/servo/components/style/buil
 index 4b5d362..4ca6925 100644
 --- a/servo/components/style/build_gecko.rs
 +++ b/servo/components/style/build_gecko.rs
-@@ -139,7 +139,10 @@ mod bindings {
+@@ -139,7 +139,9 @@ mod bindings {
  
              // Disable rust unions, because we replace some types inside of
              // them.
@@ -96,7 +96,6 @@ index 4b5d362..4ca6925 100644
 +            let mut builder = Builder::default().rust_target(RustTarget::Stable_1_0)
 +                .clang_arg("-target")
 +                .clang_arg("arm-linux-gnueabihf")
-+                .clang_arg("-I/usr/arm-linux-gnueabihf/include/c++/4.8.4/arm-linux-gnueabihf");
  
              let rustfmt_path = env::var_os("RUSTFMT")
                  // This can be replaced with

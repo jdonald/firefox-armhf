@@ -5,9 +5,10 @@ but this flow has since been revised for a Debian Stretch amd64 container
 targeting Raspbian.
 
 The instructions below are for a recent major release such as Firefox
-65.0. To build Firefox ESR 60.0, see **esr.md**.
+65.0. To build Firefox ESR 60.5, see **esr.md**.
 
-Trusty-specific notes have been moved to **trusty.md**.
+Trusty-specific notes have been moved to **trusty.md**. There is also
+a **xenial.md**.
 
 This is not regularly tested with continuous integration, so if you attempt
 the procedure below please expect to run into missing packages or other problems
@@ -18,8 +19,8 @@ that you'll have to troubleshoot.
     curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
     sudo apt install -y gir1.2-atk-1.0:armhf gir1.2-freedesktop:armhf gir1.2-gdkpixbuf-2.0:armhf \
       gir1.2-notify-0.7:armhf gir1.2-pango-1.0:armhf libatk1.0-dev:armhf libgdk-pixbuf2.0-dev:armhf \
-      libgirepository-1.0-1:armhf libgtk-3-dev:armhf gtk+-2.0:armhf libgtk2.0-dev:armhf \
-      libpango1.0-dev:armhf libharfbuzz-dev:armhf libicu-dev:armhf libxt-dev:armhf libgtk-3-dev:armhf \
+      libgirepository-1.0-1:armhf libgtk-3-dev:armhf libgtk2.0-dev:armhf \
+      libpango1.0-dev:armhf libharfbuzz-dev:armhf libicu-dev:armhf libxt-dev:armhf \
       libstartup-notification0-dev:armhf libasound2-dev:armhf libcurl4-openssl-dev:armhf \
       libdbus-glib-1-dev:armhf libiw-dev:armhf libnotify-dev:armhf libpulse-dev:armhf fakeroot \
       devscripts build-essential dpkg-cross crossbuild-essential-armhf \
@@ -44,25 +45,17 @@ Add Firefox bionic source packages and fetch source:
     apt-get source firefox:armhf
     cd firefox-*
 
-Apply Rust cross-build patch:
-
-    patch -p1 < build_gecko.rs.patch
-
-Apply `rules.patch` to fix some conditions that are too Ubuntu-specific. Otherwise early
-on you'll hit a strange error about being unable to find `usr.bin.firefox.in`
-
-    patch -p1 < rules.patch
-
-Firefox 64.0 has this major change according to the changelog:
+We need to patch `build_gecko.rs` to pass a cross-compile flag to its clang options.
+`debian/rules` has some apparmor conditions that are too Ubuntu-specific. The
+WebRTC module seems to have been patched but is missing essential ASFLAGS.
+Firefox 64.0 added a major change:
 
     # * Explicitly set HOME=/tmp
 
-which breaks existing build flows. Apply `rules.mk.patch` to remove the line.
+which breaks existing build flows. Apply the complete **armhf.patch** to fix all
+of the above:
 
-The WebRTC module has a bug that can manifest as an error on sbfx instructions. Fix this
-to use the appropriate ASFLAGS:
-
-    patch -p1 < webrtc.patch
+    patch -p1 < path/to/firefox-armhf/armhf.patch
 
 Then run **dpkg-buildpackage**:
 
@@ -105,8 +98,11 @@ This means that the whole usr/lib folder never got populated. Create it and copy
 Resume here and it will take a while for all localizations. If you reach the end you'll see the error:
 
     gpg: skipped "Olivier Tilloy <olivier.tilloy@canonical.com>": No secret key
-    gpg: dpkg-sign.8YBNCg8D/firefox_64.0+build3-0ubuntu0.18.04.1_armhf.buildinfo: clear-sign failed: No secret key
+    gpg: dpkg-sign.8YBNCg8D/firefox_65.0+build2-0ubuntu0.18.04.1_armhf.buildinfo: clear-sign failed: No secret key
 
     dpkg-buildpackage: error: failed to sign .buildinfo file
 
 Although the message may not sound positive, at that point you'll find a set of deb packages in your home directory.
+On a good day you might see a clean finish:
+
+    dpkg-buildpackage: info: binary-only upload (no source included)
