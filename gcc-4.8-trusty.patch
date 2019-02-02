@@ -1,5 +1,5 @@
---- /usr/include/c++/4.8/cstdio.old	2018-05-04 23:03:38.356052628 +0000
-+++ /usr/include/c++/4.8/cstdio	2018-05-02 03:24:30.633532078 +0000
+--- /usr/include/c++/4.8/cstdio.old	2019-01-31 17:48:53.014814177 +0000
++++ /usr/include/c++/4.8/cstdio	2019-01-31 17:49:15.630946991 +0000
 @@ -117,7 +117,7 @@
    using ::fwrite;
    using ::getc;
@@ -9,9 +9,236 @@
    using ::perror;
    using ::printf;
    using ::putc;
---- /usr/include/c++/4.8/complex.old	2018-05-04 23:02:02.629655334 +0000
-+++ /usr/include/c++/4.8/complex	2018-05-03 17:48:51.059255348 +0000
-@@ -1217,11 +1217,11 @@
+--- /usr/include/c++/4.8/complex.old	2019-01-31 17:49:06.918884581 +0000
++++ /usr/include/c++/4.8/complex	2019-01-31 18:21:39.571921488 +0000
+@@ -1,6 +1,6 @@
+ // The template and inlines for the -*- C++ -*- complex number classes.
+ 
+-// Copyright (C) 1997-2013 Free Software Foundation, Inc.
++// Copyright (C) 1997-2016 Free Software Foundation, Inc.
+ //
+ // This file is part of the GNU ISO C++ Library.  This library is free
+ // software; you can redistribute it and/or modify it under the
+@@ -88,11 +88,8 @@
+   template<typename _Tp> complex<_Tp> log(const complex<_Tp>&);
+   /// Return complex base 10 logarithm of @a z.
+   template<typename _Tp> complex<_Tp> log10(const complex<_Tp>&);
+-#if __cplusplus < 201103L
+-  // DR 844.
+   /// Return @a x to the @a y'th power.
+   template<typename _Tp> complex<_Tp> pow(const complex<_Tp>&, int);
+-#endif
+   /// Return @a x to the @a y'th power.
+   template<typename _Tp> complex<_Tp> pow(const complex<_Tp>&, const _Tp&);
+   /// Return @a x to the @a y'th power.
+@@ -132,9 +129,12 @@
+       _GLIBCXX_CONSTEXPR complex(const _Tp& __r = _Tp(), const _Tp& __i = _Tp())
+       : _M_real(__r), _M_imag(__i) { }
+ 
+-      // Lets the compiler synthesize the copy constructor   
+-      // complex (const complex<_Tp>&);
+-      ///  Copy constructor.
++      // Let the compiler synthesize the copy constructor
++#if __cplusplus >= 201103L
++      constexpr complex(const complex&) = default;
++#endif
++
++      ///  Converting constructor.
+       template<typename _Up>
+         _GLIBCXX_CONSTEXPR complex(const complex<_Up>& __z)
+ 	: _M_real(__z.real()), _M_imag(__z.imag()) { }
+@@ -144,11 +144,11 @@
+       // DR 387. std::complex over-encapsulated.
+       _GLIBCXX_ABI_TAG_CXX11
+       constexpr _Tp 
+-      real() { return _M_real; }
++      real() const { return _M_real; }
+ 
+       _GLIBCXX_ABI_TAG_CXX11
+       constexpr _Tp 
+-      imag() { return _M_imag; }
++      imag() const { return _M_imag; }
+ #else
+       ///  Return real part of complex number.
+       _Tp& 
+@@ -175,10 +175,10 @@
+       void 
+       imag(_Tp __val) { _M_imag = __val; }
+ 
+-      /// Assign this complex number to scalar @a t.
++      /// Assign a scalar to this complex number.
+       complex<_Tp>& operator=(const _Tp&);
+       
+-      /// Add @a t to this complex number.
++      /// Add a scalar to this complex number.
+       // 26.2.5/1
+       complex<_Tp>&
+       operator+=(const _Tp& __t)
+@@ -187,7 +187,7 @@
+ 	return *this;
+       }
+ 
+-      /// Subtract @a t from this complex number.
++      /// Subtract a scalar from this complex number.
+       // 26.2.5/3
+       complex<_Tp>&
+       operator-=(const _Tp& __t)
+@@ -196,31 +196,33 @@
+ 	return *this;
+       }
+ 
+-      /// Multiply this complex number by @a t.
++      /// Multiply this complex number by a scalar.
+       complex<_Tp>& operator*=(const _Tp&);
+-      /// Divide this complex number by @a t.
++      /// Divide this complex number by a scalar.
+       complex<_Tp>& operator/=(const _Tp&);
+ 
+-      // Lets the compiler synthesize the
+-      // copy and assignment operator
+-      // complex<_Tp>& operator= (const complex<_Tp>&);
+-      /// Assign this complex number to complex @a z.
++      // Let the compiler synthesize the copy assignment operator
++#if __cplusplus >= 201103L
++      complex& operator=(const complex&) = default;
++#endif
++
++      /// Assign another complex number to this one.
+       template<typename _Up>
+         complex<_Tp>& operator=(const complex<_Up>&);
+-      /// Add @a z to this complex number.
++      /// Add another complex number to this one.
+       template<typename _Up>
+         complex<_Tp>& operator+=(const complex<_Up>&);
+-      /// Subtract @a z from this complex number.
++      /// Subtract another complex number from this one.
+       template<typename _Up>
+         complex<_Tp>& operator-=(const complex<_Up>&);
+-      /// Multiply this complex number by @a z.
++      /// Multiply this complex number by another.
+       template<typename _Up>
+         complex<_Tp>& operator*=(const complex<_Up>&);
+-      /// Divide this complex number by @a z.
++      /// Divide this complex number by another.
+       template<typename _Up>
+         complex<_Tp>& operator/=(const complex<_Up>&);
+ 
+-      _GLIBCXX_USE_CONSTEXPR complex __rep() const
++      _GLIBCXX_CONSTEXPR complex __rep() const
+       { return *this; }
+ 
+     private:
+@@ -628,7 +630,7 @@
+ 
+   // 26.2.7/5: norm(__z) returns the squared magnitude of __z.
+   //     As defined, norm() is -not- a norm is the common mathematical
+-  //     sens used in numerics.  The helper class _Norm_helper<> tries to
++  //     sense used in numerics.  The helper class _Norm_helper<> tries to
+   //     distinguish between builtin floating point and the rest, so as
+   //     to deliver an answer as close as possible to the real value.
+   template<bool>
+@@ -665,7 +667,10 @@
+   template<typename _Tp>
+     inline complex<_Tp>
+     polar(const _Tp& __rho, const _Tp& __theta)
+-    { return complex<_Tp>(__rho * cos(__theta), __rho * sin(__theta)); }
++    {
++      __glibcxx_assert( __rho >= 0 );
++      return complex<_Tp>(__rho * cos(__theta), __rho * sin(__theta));
++    }
+ 
+   template<typename _Tp>
+     inline complex<_Tp>
+@@ -738,7 +743,7 @@
+   template<typename _Tp>
+     inline complex<_Tp>
+     __complex_exp(const complex<_Tp>& __z)
+-    { return std::polar(exp(__z.real()), __z.imag()); }
++    { return std::polar<_Tp>(exp(__z.real()), __z.imag()); }
+ 
+ #if _GLIBCXX_USE_C99_COMPLEX
+   inline __complex__ float
+@@ -955,7 +960,6 @@
+   // 26.2.8/9  pow(__x, __y): Returns the complex power base of __x
+   //                          raised to the __y-th power.  The branch
+   //                          cut is on the negative axis.
+-#if __cplusplus < 201103L
+   template<typename _Tp>
+     complex<_Tp>
+     __complex_pow_unsigned(complex<_Tp> __x, unsigned __n)
+@@ -972,8 +976,12 @@
+       return __y;
+     }
+ 
+-  // _GLIBCXX_RESOLVE_LIB_DEFECTS
++  // In C++11 mode we used to implement the resolution of
+   // DR 844. complex pow return type is ambiguous.
++  // thus the following overload was disabled in that mode.  However, doing
++  // that causes all sorts of issues, see, for example:
++  //   http://gcc.gnu.org/ml/libstdc++/2013-01/msg00058.html
++  // and also PR57974.
+   template<typename _Tp>
+     inline complex<_Tp>
+     pow(const complex<_Tp>& __z, int __n)
+@@ -982,13 +990,12 @@
+ 	? complex<_Tp>(1) / std::__complex_pow_unsigned(__z, -(unsigned)__n)
+         : std::__complex_pow_unsigned(__z, __n);
+     }
+-#endif
+ 
+   template<typename _Tp>
+     complex<_Tp>
+     pow(const complex<_Tp>& __x, const _Tp& __y)
+     {
+-#ifndef _GLIBCXX_USE_C99_COMPLEX
++#if ! _GLIBCXX_USE_C99_COMPLEX
+       if (__x == _Tp())
+ 	return _Tp();
+ #endif
+@@ -996,7 +1003,7 @@
+         return pow(__x.real(), __y);
+ 
+       complex<_Tp> __t = std::log(__x);
+-      return std::polar(exp(__y * __t.real()), __y * __t.imag());
++      return std::polar<_Tp>(exp(__y * __t.real()), __y * __t.imag());
+     }
+ 
+   template<typename _Tp>
+@@ -1033,8 +1040,8 @@
+     inline complex<_Tp>
+     pow(const _Tp& __x, const complex<_Tp>& __y)
+     {
+-      return __x > _Tp() ? std::polar(pow(__x, __y.real()),
+-				      __y.imag() * log(__x))
++      return __x > _Tp() ? std::polar<_Tp>(pow(__x, __y.real()),
++					   __y.imag() * log(__x))
+ 	                 : std::pow(complex<_Tp>(__x), __y);
+     }
+ 
+@@ -1066,11 +1073,11 @@
+       // DR 387. std::complex over-encapsulated.
+       __attribute ((__abi_tag__ ("cxx11")))
+       constexpr float 
+-      real() { return __real__ _M_value; }
++      real() const { return __real__ _M_value; }
+ 
+       __attribute ((__abi_tag__ ("cxx11")))
+       constexpr float 
+-      imag() { return __imag__ _M_value; }
++      imag() const { return __imag__ _M_value; }
+ #else
+       float& 
+       real() { return __real__ _M_value; }
+@@ -1181,7 +1188,7 @@
+ 	  return *this;
+ 	}
+ 
+-      _GLIBCXX_USE_CONSTEXPR _ComplexT __rep() const { return _M_value; }
++      _GLIBCXX_CONSTEXPR _ComplexT __rep() const { return _M_value; }
+ 
+     private:
+       _ComplexT _M_value;
+@@ -1217,11 +1224,11 @@
        // DR 387. std::complex over-encapsulated.
        __attribute ((__abi_tag__ ("cxx11")))
        constexpr double 
@@ -25,3 +252,286 @@
  #else
        double& 
        real() { return __real__ _M_value; }
+@@ -1331,7 +1338,7 @@
+ 	  return *this;
+ 	}
+ 
+-      _GLIBCXX_USE_CONSTEXPR _ComplexT __rep() const { return _M_value; }
++      _GLIBCXX_CONSTEXPR _ComplexT __rep() const { return _M_value; }
+ 
+     private:
+       _ComplexT _M_value;
+@@ -1369,11 +1376,11 @@
+       // DR 387. std::complex over-encapsulated.
+       __attribute ((__abi_tag__ ("cxx11")))
+       constexpr long double 
+-      real() { return __real__ _M_value; }
++      real() const { return __real__ _M_value; }
+ 
+       __attribute ((__abi_tag__ ("cxx11")))
+       constexpr long double 
+-      imag() { return __imag__ _M_value; }
++      imag() const { return __imag__ _M_value; }
+ #else
+       long double& 
+       real() { return __real__ _M_value; }
+@@ -1483,7 +1490,7 @@
+ 	  return *this;
+ 	}
+ 
+-      _GLIBCXX_USE_CONSTEXPR _ComplexT __rep() const { return _M_value; }
++      _GLIBCXX_CONSTEXPR _ComplexT __rep() const { return _M_value; }
+ 
+     private:
+       _ComplexT _M_value;
+@@ -1824,7 +1831,7 @@
+     arg(_Tp __x)
+     {
+       typedef typename __gnu_cxx::__promote<_Tp>::__type __type;
+-#if (_GLIBCXX_USE_C99_MATH && !_GLIBCXX_USE_C99_FP_MACROS_DYNAMIC)
++#if (_GLIBCXX11_USE_C99_MATH && !_GLIBCXX_USE_C99_FP_MACROS_DYNAMIC)
+       return std::signbit(__x) ? __type(3.1415926535897932384626433832795029L)
+ 	                       : __type();
+ #else
+@@ -1926,6 +1933,45 @@
+     { return __x; }
+ 
+ _GLIBCXX_END_NAMESPACE_VERSION
++
++#if __cplusplus > 201103L
++
++inline namespace literals {
++inline namespace complex_literals {
++_GLIBCXX_BEGIN_NAMESPACE_VERSION
++
++#define __cpp_lib_complex_udls 201309
++
++  constexpr std::complex<float>
++  operator""if(long double __num)
++  { return std::complex<float>{0.0F, static_cast<float>(__num)}; }
++
++  constexpr std::complex<float>
++  operator""if(unsigned long long __num)
++  { return std::complex<float>{0.0F, static_cast<float>(__num)}; }
++
++  constexpr std::complex<double>
++  operator""i(long double __num)
++  { return std::complex<double>{0.0, static_cast<double>(__num)}; }
++
++  constexpr std::complex<double>
++  operator""i(unsigned long long __num)
++  { return std::complex<double>{0.0, static_cast<double>(__num)}; }
++
++  constexpr std::complex<long double>
++  operator""il(long double __num)
++  { return std::complex<long double>{0.0L, __num}; }
++
++  constexpr std::complex<long double>
++  operator""il(unsigned long long __num)
++  { return std::complex<long double>{0.0L, static_cast<long double>(__num)}; }
++
++_GLIBCXX_END_NAMESPACE_VERSION
++} // inline namespace complex_literals
++} // inline namespace literals
++
++#endif // C++14
++
+ } // namespace
+ 
+ #endif  // C++11
+--- /usr/include/c++/4.8/utility.old	2019-01-31 17:49:21.034991834 +0000
++++ /usr/include/c++/4.8/utility	2019-01-31 17:58:21.339050693 +0000
+@@ -152,6 +152,81 @@
+     get(const std::pair<_Tp1, _Tp2>& __in) noexcept
+     { return __pair_get<_Int>::__const_get(__in); }
+ 
++  // Stores a tuple of indices.  Used by tuple and pair, and by bind() to
++  // extract the elements in a tuple.
++  template<size_t... _Indexes> struct _Index_tuple_gcc6 { };
++
++  // Concatenates two _Index_tuple_gcc6s.
++  template<typename _Itup1, typename _Itup2> struct _Itup_cat;
++
++  template<size_t... _Ind1, size_t... _Ind2>
++    struct _Itup_cat<_Index_tuple_gcc6<_Ind1...>, _Index_tuple_gcc6<_Ind2...>>
++    {
++      using __type = _Index_tuple_gcc6<_Ind1..., (_Ind2 + sizeof...(_Ind1))...>;
++    };
++
++  // Builds an _Index_tuple_gcc6<0, 1, 2, ..., _Num-1>.
++  template<size_t _Num>
++    struct _Build_index_tuple_gcc6
++    : _Itup_cat<typename _Build_index_tuple_gcc6<_Num / 2>::__type,
++		typename _Build_index_tuple_gcc6<_Num - _Num / 2>::__type>
++    { };
++
++  template<>
++    struct _Build_index_tuple_gcc6<1>
++    {
++      typedef _Index_tuple_gcc6<0> __type;
++    };
++
++  template<>
++    struct _Build_index_tuple_gcc6<0>
++    {
++      typedef _Index_tuple_gcc6<> __type;
++    };
++
++#if __cplusplus > 201103L
++
++#define __cpp_lib_integer_sequence 201304
++
++  /// Class template integer_sequence
++  template<typename _Tp, _Tp... _Idx>
++    struct integer_sequence
++    {
++      typedef _Tp value_type;
++      static constexpr size_t size() { return sizeof...(_Idx); }
++    };
++
++  template<typename _Tp, _Tp _Num,
++	   typename _ISeq = typename _Build_index_tuple_gcc6<_Num>::__type>
++    struct _Make_integer_sequence;
++
++  template<typename _Tp, _Tp _Num,  size_t... _Idx>
++    struct _Make_integer_sequence<_Tp, _Num, _Index_tuple_gcc6<_Idx...>>
++    {
++      static_assert( _Num >= 0,
++		     "Cannot make integer sequence of negative length" );
++
++      typedef integer_sequence<_Tp, static_cast<_Tp>(_Idx)...> __type;
++    };
++
++  /// Alias template make_integer_sequence
++  template<typename _Tp, _Tp _Num>
++    using make_integer_sequence
++      = typename _Make_integer_sequence<_Tp, _Num>::__type;
++
++  /// Alias template index_sequence
++  template<size_t... _Idx>
++    using index_sequence = integer_sequence<size_t, _Idx...>;
++
++  /// Alias template make_index_sequence
++  template<size_t _Num>
++    using make_index_sequence = make_integer_sequence<size_t, _Num>;
++
++  /// Alias template index_sequence_for
++  template<typename... _Types>
++    using index_sequence_for = make_index_sequence<sizeof...(_Types)>;
++#endif
++
+ _GLIBCXX_END_NAMESPACE_VERSION
+ } // namespace
+ 
+--- /usr/include/c++/4.8/type_traits.old	2019-01-31 17:50:04.455479333 +0000
++++ /usr/include/c++/4.8/type_traits	2019-01-31 18:49:04.661314780 +0000
+@@ -59,7 +59,13 @@
+       static constexpr _Tp                  value = __v;
+       typedef _Tp                           value_type;
+       typedef integral_constant<_Tp, __v>   type;
+-      constexpr operator value_type() { return value; }
++      constexpr operator value_type() const { return value; }
++#if __cplusplus > 201103L
++
++#define __cpp_lib_integral_constant_callable 201304
++
++      constexpr value_type operator()() const { return value; }
++#endif
+     };
+   
+   template<typename _Tp, _Tp __v>
+@@ -1366,6 +1372,35 @@
+       add_const<typename add_volatile<_Tp>::type>::type     type;
+     };
+ 
++#if __cplusplus > 201103L
++
++#define __cpp_lib_transformation_trait_aliases 201304
++
++  /// Alias template for remove_const
++  template<typename _Tp>
++    using remove_const_t = typename remove_const<_Tp>::type;
++
++  /// Alias template for remove_volatile
++  template<typename _Tp>
++    using remove_volatile_t = typename remove_volatile<_Tp>::type;
++
++  /// Alias template for remove_cv
++  template<typename _Tp>
++    using remove_cv_t = typename remove_cv<_Tp>::type;
++
++  /// Alias template for add_const
++  template<typename _Tp>
++    using add_const_t = typename add_const<_Tp>::type;
++
++  /// Alias template for add_volatile
++  template<typename _Tp>
++    using add_volatile_t = typename add_volatile<_Tp>::type;
++
++  /// Alias template for add_cv
++  template<typename _Tp>
++    using add_cv_t = typename add_cv<_Tp>::type;
++
++#endif
+ 
+   // Reference transformations.
+ 
+@@ -1645,6 +1680,15 @@
+     struct remove_all_extents<_Tp[]>
+     { typedef typename remove_all_extents<_Tp>::type     type; };
+ 
++#if __cplusplus > 201103L
++  /// Alias template for remove_extent
++  template<typename _Tp>
++    using remove_extent_t = typename remove_extent<_Tp>::type;
++
++  /// Alias template for remove_all_extents
++  template<typename _Tp>
++    using remove_all_extents_t = typename remove_all_extents<_Tp>::type;
++#endif
+ 
+   // Pointer modifications.
+ 
+--- /usr/include/c++/4.8/bits/unique_ptr.h.old	2019-01-31 18:46:36.366304880 +0000
++++ /usr/include/c++/4.8/bits/unique_ptr.h	2019-01-31 18:47:14.271074223 +0000
+@@ -607,6 +607,40 @@
+       }
+     };
+ 
++#if __cplusplus > 201103L
++
++#define __cpp_lib_make_unique 201304
++
++  template<typename _Tp>
++    struct _MakeUniq
++    { typedef unique_ptr<_Tp> __single_object; };
++
++  template<typename _Tp>
++    struct _MakeUniq<_Tp[]>
++    { typedef unique_ptr<_Tp[]> __array; };
++
++  template<typename _Tp, size_t _Bound>
++    struct _MakeUniq<_Tp[_Bound]>
++    { struct __invalid_type { }; };
++
++  /// std::make_unique for single objects
++  template<typename _Tp, typename... _Args>
++    inline typename _MakeUniq<_Tp>::__single_object
++    make_unique(_Args&&... __args)
++    { return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...)); }
++
++  /// std::make_unique for arrays of unknown bound
++  template<typename _Tp>
++    inline typename _MakeUniq<_Tp>::__array
++    make_unique(size_t __num)
++    { return unique_ptr<_Tp>(new remove_extent_t<_Tp>[__num]()); }
++
++  /// Disable std::make_unique for arrays of known bound
++  template<typename _Tp, typename... _Args>
++    inline typename _MakeUniq<_Tp>::__invalid_type
++    make_unique(_Args&&...) = delete;
++#endif
++
+   // @} group pointer_abstractions
+ 
+ _GLIBCXX_END_NAMESPACE_VERSION

@@ -24,15 +24,25 @@ contains the expected Trusty ports.
 Then sudo apt update and install the many packages listed in README in addition
 to **rustup** and **node** version 11.
 
-Specific to Trusty: Apply a *system-level* libstdc++ patch. See `gcc-4.8.trusty.patch`
+Python 3.4 is the default on Trusty, but Firefox's build process requires 3.5 or newer.
+
+    sudo apt install python3.5
+
+Patches have been bundled together in a single **trusty.patch**. For the most part
+it's similar to the Stretch patches except using gcc 4.8.4 headers instead of 6.3.0.
+
+    patch -p1 < path/to/firefox-armhf/trusty.patch
+
+For clang to use old gcc headers, you must apply a *system-level* libstdc++ patch:
+
+    (cd / && sudo patch -p1 < path/to/firefox-armhf/gcc-4.8-trusty.patch)
+
+Get Firefox source:
 
     apt-get source firefox:armhf
     cd firefox-*
 
-Apply Trusty-specific Rust build system patch: `build_gecko.rs-trusty.patch`
-It's basically the same as `build_gecko.rs.patch` except gcc 4.8.4 is substituted for 6.3.0
-
-Then build:
+Build:
 
     PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig \
       CONFIG_SITE=/etc/dpkg-cross/cross-config.amd64 \
@@ -40,9 +50,23 @@ Then build:
       dpkg-buildpackage -aarmhf -b -d
 
 After configuration errors, replace mozconfig with `mozconfig.trusty`
-Again it's very similar to the included mozconfig except s/6.3.0/4.8.4/
+and edit paths. It's similar to the included mozconfig except s/6.3.0/4.8.4/
 
     PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig \
       CONFIG_SITE=/etc/dpkg-cross/cross-config.amd64 \
       DEB_BUILD_OPTIONS=nocheck \
       dpkg-buildpackage -aarmhf -b -d -nc
+
+This will likely encounter the shlibsign error so work around that
+just as described in **README.md**.
+
+The final build step might complain about missing files from debian/tmp, which
+is frustrating as the build process nukes the tmp subfolder. To get past that,
+try pausing with Ctrl+Z followed by:
+
+    mkdir -p debian/tmp/usr/lib
+    cp -rpf obj-arm-linux-gnueabihf/dist/* debian/tmp/usr/lib
+
+Then bring the incremental build back into the foreground with:
+
+    fg

@@ -1,0 +1,102 @@
+diff --git a/debian/build/rules.mk b/debian/build/rules.mk
+index 0681341..40e7c89 100644
+--- a/debian/build/rules.mk
++++ b/debian/build/rules.mk
+@@ -124,7 +124,6 @@ DEB_MAKE_ENVVARS += CXX=$(CURDIR)/debian/gcc-mozilla/g++
+ DEB_MAKE_ENVVARS += PATH=$(CURDIR)/debian/gcc-mozilla:$$PATH
+ DEB_MAKE_ENVVARS += CPLUS_INCLUDE_PATH=/usr/lib/gcc-mozilla/include/c++/6:/usr/lib/gcc-mozilla/include/c++/6/$(DEB_HOST_GNU_TYPE)
+ 
+-export HOME=/tmp
+ export SHELL=/bin/bash
+ export NO_PNG_PKG_MANGLE=1
+ export DEB_BUILD_HARDENING=1
+diff --git a/debian/rules b/debian/rules
+index 4dba05d..daf521b 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -60,10 +60,12 @@ include $(CURDIR)/debian/build/rules.mk
+ 						$(NULL)
+ 
+ debian/usr.bin.firefox.in:
+-	if [ '$(DISTRIB_VERSION_MAJOR)$(DISTRIB_VERSION_MINOR)' -ge '1410' ]; then \
++	if [ '$(DISTRIB_VERSION_MAJOR)' -eq '9' ] || [ '$(DISTRIB_VERSION_MAJOR)$(DISTRIB_VERSION_MINOR)' -ge '1410' ]; then \
+ 		cp $(CURDIR)/debian/usr.bin.firefox.apparmor.14.10 $(CURDIR)/debian/usr.bin.firefox.in ; \
+ 	elif [ '$(DISTRIB_VERSION_MAJOR)$(DISTRIB_VERSION_MINOR)' -ge '1310' ]; then \
+ 		cp $(CURDIR)/debian/usr.bin.firefox.apparmor.13.10 $(CURDIR)/debian/usr.bin.firefox.in ; \
++	else \
++		echo "If this line is reached, unsupported config failing miserably unable to find usr.bin.firefox.in"; \
+ 	fi
+ 
+ WRITE_SUBSTVARS = $(shell echo "$(2)=$(3)" | sed 's/[ \t\n]\+/ /g' >> debian/$(1).substvars)
+diff --git a/media/libwebp/src/dsp/moz.build b/media/libwebp/src/dsp/moz.build
+index 49ab4a1..079714f 100644
+--- a/media/libwebp/src/dsp/moz.build
++++ b/media/libwebp/src/dsp/moz.build
+@@ -22,7 +22,7 @@ LOCAL_INCLUDES += [
+     '/media/libwebp',
+ ]
+ 
+-if CONFIG['CPU_ARCH'] == 'arm' and CONFIG['BUILD_ARM_NEON']:
++if CONFIG['CPU_ARCH'] == 'arm':
+     SOURCES += [
+         'alpha_processing_neon.c',
+         'dec_neon.c',
+diff --git a/media/webrtc/trunk/webrtc/common_audio/common_audio_c_arm_asm_gn/moz.build b/media/webrtc/trunk/webrtc/common_audio/common_audio_c_arm_asm_gn/moz.build
+index ca041b5..3ed0f78 100644
+--- a/media/webrtc/trunk/webrtc/common_audio/common_audio_c_arm_asm_gn/moz.build
++++ b/media/webrtc/trunk/webrtc/common_audio/common_audio_c_arm_asm_gn/moz.build
+@@ -132,6 +132,10 @@ if CONFIG["CPU_ARCH"] == "arm":
+     DEFINES["WEBRTC_ARCH_ARM_V7"] = True
+     DEFINES["WEBRTC_HAS_NEON"] = True
+ 
++    ASFLAGS += [
++        "-march=armv7-a"
++    ]
++
+     SOURCES += [
+         "/media/webrtc/trunk/webrtc/common_audio/signal_processing/complex_bit_reverse_arm.S",
+         "/media/webrtc/trunk/webrtc/common_audio/signal_processing/filter_ar_fast_q12_armv7.S",
+diff --git a/media/webrtc/trunk/webrtc/common_audio/common_audio_c_gn/moz.build b/media/webrtc/trunk/webrtc/common_audio/common_audio_c_gn/moz.build
+index 2c9e630..b9e0a96 100644
+--- a/media/webrtc/trunk/webrtc/common_audio/common_audio_c_gn/moz.build
++++ b/media/webrtc/trunk/webrtc/common_audio/common_audio_c_gn/moz.build
+@@ -212,6 +212,10 @@ if CONFIG["CPU_ARCH"] == "arm":
+         "-mfpu=neon"
+     ]
+ 
++    ASFLAGS += [
++        "-march=armv7-a"
++    ]
++
+     DEFINES["WEBRTC_ARCH_ARM"] = True
+     DEFINES["WEBRTC_ARCH_ARM_V7"] = True
+     DEFINES["WEBRTC_HAS_NEON"] = True
+diff --git a/security/manager/ssl/OSKeyStore.cpp b/security/manager/ssl/OSKeyStore.cpp
+index f22475e..0a08408 100644
+--- a/security/manager/ssl/OSKeyStore.cpp
++++ b/security/manager/ssl/OSKeyStore.cpp
+@@ -712,7 +712,7 @@ nsresult AbstractOSKeyStore::DoCipher(const UniquePK11SymKey& aSymKey,
+                        &outLen, inBytes.size() + blockLength, inBytes.data(),
+                        inBytes.size());
+     // Prepend the used IV to the ciphertext.
+-    Unused << outBytes.insert(outBytes.begin(), ivp, ivp + mIVLength);
++    outBytes.insert(outBytes.begin(), ivp, ivp + mIVLength);
+     outLen += mIVLength;
+   } else {
+     // Remove the IV from the input.
+diff --git a/servo/components/style/build_gecko.rs b/servo/components/style/build_gecko.rs
+index 4b5d362..4ca6925 100644
+--- a/servo/components/style/build_gecko.rs
++++ b/servo/components/style/build_gecko.rs
+@@ -139,7 +139,10 @@ mod bindings {
+ 
+             // Disable rust unions, because we replace some types inside of
+             // them.
+-            let mut builder = Builder::default().rust_target(RustTarget::Stable_1_0);
++            let mut builder = Builder::default().rust_target(RustTarget::Stable_1_0)
++                .clang_arg("-target")
++                .clang_arg("arm-linux-gnueabihf")
++                .clang_arg("-I/usr/arm-linux-gnueabihf/include/c++/4.8.4/arm-linux-gnueabihf");
+ 
+             let rustfmt_path = env::var_os("RUSTFMT")
+                 // This can be replaced with

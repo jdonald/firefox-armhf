@@ -23,8 +23,8 @@ that you'll have to troubleshoot.
       libstartup-notification0-dev:armhf libasound2-dev:armhf libcurl4-openssl-dev:armhf \
       libdbus-glib-1-dev:armhf libiw-dev:armhf libnotify-dev:armhf libpulse-dev:armhf fakeroot \
       devscripts build-essential dpkg-cross crossbuild-essential-armhf \
-      libreadline-dev:armhf libffi-dev:armf libbz2-dev:armhf libjsoncpp-dev:armhf \
-      libnss3-tools debhelper autoconf2.13 cdbs clang-3.9 zip nodejs
+      libreadline-dev:armhf libbz2-dev:armhf libjsoncpp-dev:armhf \
+      libnss3-tools debhelper autoconf2.13 cdbs clang-3.9 zip python nodejs
 
 Install **rustup**:
 
