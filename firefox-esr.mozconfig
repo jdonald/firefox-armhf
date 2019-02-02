@@ -5,7 +5,7 @@ CC=clang-3.9
 CXX=clang++-3.9
 ac_add_options --host=x86_64-linux-gnu
 ac_add_options --target=arm-linux-gnueabihf
-ac_add_options --enable-optimize="-O2 -march=armv7-a -mfloat-abi=hard -I/usr/arm-linux-gnueabihf/include/c++/6.3.0/arm-linux-gnueabihf"
+ac_add_options --enable-optimize="-O2 -march=armv7-a -mfloat-abi=hard"
 ac_add_options --disable-elf-hack
 ac_add_options --with-app-name=firefox-esr
 ac_add_options --enable-release

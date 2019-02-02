@@ -95,7 +95,7 @@ index 4b5d362..4ca6925 100644
 -            let mut builder = Builder::default().rust_target(RustTarget::Stable_1_0);
 +            let mut builder = Builder::default().rust_target(RustTarget::Stable_1_0)
 +                .clang_arg("-target")
-+                .clang_arg("arm-linux-gnueabihf")
++                .clang_arg("arm-linux-gnueabihf");
  
              let rustfmt_path = env::var_os("RUSTFMT")
                  // This can be replaced with
