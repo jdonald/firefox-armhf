@@ -2,17 +2,17 @@
 
 For targeting Ubuntu 16.04 Xenial, start an `ubuntu:xenial`
 Docker container then for the most follow the main **README.md**
-using the same instructions as Stretch.
+using instructions similar to Stretch:
 
-In fact the standard Ubuntu repositories may have Xenial sources a
-full version behind, so for Firefox 65.0 I still had to add Bionic
-sources before running `sudo apt-get source firefox:armhf`.
+For Xenial armhf sources, add these lines to your `sources.list`.
 
-One minor difference: use `mozconfig.xenial`:
+    deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ xenial-updates universe
+    deb-src [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ xenial-updates universe
+
+Use the slightly modified `mozconfig.xenial`:
 
     cp path/to/firefox-armhf/mozconfig.xenial mozconfig
 
-then edit to paths to match your home directory. The only difference
-between this and the Stretch configuration is the --enable-crashreporter
-flag. Without it, the final packaging step may complain about missing
-`usr/lib/firefox/crashreporter`.
+then edit to paths to match your home directory. Note the
+--enable-crashreporter flag. Without it, the final packaging
+step may complain about missing `usr/lib/firefox/crashreporter`.

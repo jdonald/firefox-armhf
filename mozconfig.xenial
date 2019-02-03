@@ -11,7 +11,7 @@ ac_add_options --disable-install-strip
 ac_add_options --disable-updater
 ac_add_options --enable-application=browser
 ac_add_options --enable-startup-notification
-ac_add_options --with-distribution-id=org.debian
+ac_add_options --with-distribution-id=com.ubuntu
 ac_add_options --enable-debug-symbols
 # See https://launchpad.net/bugs/1711337
 ac_add_options --enable-optimize="-O2 -march=armv7-a -mfloat-abi=hard"
@@ -28,7 +28,7 @@ ac_add_options --enable-official-branding
 ac_add_options --enable-update-channel=release
 ac_add_options --disable-debug
 ac_add_options --disable-elf-hack
-ac_add_options --with-ua-vendor=Debian
+ac_add_options --with-ua-vendor=Ubuntu
 # Set up Google API keys, see http://www.chromium.org/developers/how-tos/api-keys .
 # Note: these are for Ubuntu use ONLY. For your own distribution,
 # please get your own set of keys.
@@ -36,3 +36,4 @@ ac_add_options --with-ua-vendor=Debian
 # Feel free to contact Chad Miller (chad.miller@canonical.com) or Chris
 # Coulson (chris.coulson@canonical.com) for more info
 ac_add_options --with-google-api-keyfile=/home/youruserid/firefox-65.0+build2/debian/ga
+ac_add_options --enable-stdcxx-compat
