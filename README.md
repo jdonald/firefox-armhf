@@ -5,14 +5,21 @@ but this flow has since been revised for a Debian Stretch amd64 container
 targeting Raspbian.
 
 The instructions below are for a recent major release such as Firefox
-65.0. To build Firefox ESR 60.5, see **esr.md**.
+65.0 as this was last revised in February 2019. To build Firefox ESR 60.5,
+see **esr.md**. Trusty-specific notes have been moved to **trusty.md**.
+There is also a **xenial.md**.
 
-Trusty-specific notes have been moved to **trusty.md**. There is also
-a **xenial.md**.
+While this is glaringly out-of-date relative to Firefox 68.0.1, Firefox
+ESR 60.8, and beyond, as of June 2019 they released Raspbian 10 Buster.
+That distro plays nicely with the gcc-based Firefox Bionic binaries and
+relieves the needs of most users.
 
-This is not regularly tested with continuous integration, so if you attempt
-the procedure below please expect to run into missing packages or other problems
-that you'll have to troubleshoot.
+If you attempt the build procedure below please expect to run into
+missing packages or other problems that you'll have to troubleshoot. Also
+keep an eye on the list of GitHub issues for what others have come across.
+
+If you're interested in maintaining this for newer releases of Firefox,
+pull requests are welcome.
 
     sudo dpkg --add-architecture armhf
     sudo apt update
